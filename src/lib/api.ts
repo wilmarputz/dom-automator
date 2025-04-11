@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Types
 export interface Episode {
@@ -10,8 +11,8 @@ export interface Episode {
   cover_image: string | null;
   is_public: boolean | null;
   status: string | null;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string; // Changed from Date to string to match Supabase's return type
+  updated_at: string; // Changed from Date to string to match Supabase's return type
   user_id: string;
 }
 
@@ -20,11 +21,17 @@ export interface GeneratedContent {
   episode_id: string;
   module_type: string;
   content: string | null;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string; // Changed from Date to string to match Supabase's return type
+  updated_at: string; // Changed from Date to string to match Supabase's return type
 }
 
 export type ModuleType = 'prompt_visual' | 'roteiro_completo' | 'roteiro_cena' | 'roteiro_livro' | 'roteiro_audiobook';
+
+// Helper function to get current user ID
+const getCurrentUserId = async (): Promise<string | null> => {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.user.id || null;
+}
 
 // API Functions
 export const fetchEpisodes = async (): Promise<Episode[]> => {
@@ -79,12 +86,16 @@ export const createEpisode = async (
   description?: string
 ): Promise<Episode | null> => {
   try {
+    const userId = await getCurrentUserId();
+    if (!userId) throw new Error('User not authenticated');
+
     const { data, error } = await supabase
       .from('episodes')
       .insert({
         title,
         base_script,
-        description
+        description,
+        user_id: userId
       })
       .select()
       .single();
@@ -170,11 +181,15 @@ export const exportContent = async (
     // 2. Store the file in Supabase Storage
     // 3. Return the URL to the file
     
+    const userId = await getCurrentUserId();
+    if (!userId) throw new Error('User not authenticated');
+
     const { data, error } = await supabase
       .from('exports')
       .insert({
         episode_id: episodeId,
-        format
+        format,
+        user_id: userId
       })
       .select()
       .single();
@@ -215,12 +230,16 @@ export const createTemplate = async (
   description?: string
 ): Promise<any | null> => {
   try {
+    const userId = await getCurrentUserId();
+    if (!userId) throw new Error('User not authenticated');
+
     const { data, error } = await supabase
       .from('templates')
       .insert({
         name,
         base_script,
-        description
+        description,
+        user_id: userId
       })
       .select()
       .single();
