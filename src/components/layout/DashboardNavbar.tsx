@@ -1,9 +1,9 @@
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LogOut, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { signOut } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface DashboardNavbarProps {
   currentStep?: number;
@@ -12,19 +12,11 @@ interface DashboardNavbarProps {
 
 export function DashboardNavbar({ currentStep, showNewButton = true }: DashboardNavbarProps) {
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleSignOut = async () => {
     try {
-      await signOut();
-      
-      toast({
-        title: "Logout",
-        description: "Você foi desconectado com sucesso",
-      });
-      
-      // Redirect to home
-      navigate("/");
+      await logout();
     } catch (error: any) {
       console.error("Logout error:", error);
       

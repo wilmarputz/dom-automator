@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AuthForm } from "@/components/auth/AuthForm";
@@ -10,8 +10,12 @@ import { Loader2 } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Get the redirect path from location state, or default to dashboard
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/dashboard";
 
   const handleLogin = async (email: string, password: string) => {
     setIsLoading(true);
@@ -23,8 +27,8 @@ const Login = () => {
         description: "Você foi conectado com sucesso",
       });
       
-      // Redirect to dashboard
-      navigate("/dashboard");
+      // Redirect to dashboard or the page user was trying to access
+      navigate(from, { replace: true });
     } catch (error: any) {
       console.error("Login error:", error);
       
