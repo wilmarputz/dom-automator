@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -104,6 +103,42 @@ export const createEpisode = async (
     return data;
   } catch (error) {
     console.error('Error creating episode:', error);
+    return null;
+  }
+};
+
+export const generateAIContent = async (
+  episodeId: string,
+  moduleType: ModuleType,
+  title: string,
+  baseScript: string
+): Promise<GeneratedContent | null> => {
+  try {
+    // Call the edge function to generate content
+    const { data, error: invokeError } = await supabase.functions.invoke('generate-content', {
+      body: { episodeId, moduleType, title, baseScript },
+    });
+
+    if (invokeError) throw invokeError;
+    if (data.error) throw new Error(data.error);
+
+    // Store the generated content in the database
+    const { data: savedContent, error: saveError } = await supabase
+      .from('generated_content')
+      .upsert({
+        episode_id: episodeId,
+        module_type: moduleType,
+        content: data.content
+      }, { 
+        onConflict: 'episode_id,module_type' 
+      })
+      .select()
+      .single();
+
+    if (saveError) throw saveError;
+    return savedContent;
+  } catch (error) {
+    console.error(`Error generating ${moduleType} content with AI:`, error);
     return null;
   }
 };
@@ -264,5 +299,19 @@ export const fetchTemplates = async (): Promise<any[]> => {
   } catch (error) {
     console.error('Error fetching templates:', error);
     return [];
+  }
+};
+
+export const checkOpenAIConfig = async (): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase.functions.invoke('check-openai-config', {
+      body: {},
+    });
+    
+    if (error) throw error;
+    return data.configured;
+  } catch (error) {
+    console.error('Error checking OpenAI configuration:', error);
+    return false;
   }
 };
