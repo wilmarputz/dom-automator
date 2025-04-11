@@ -1,40 +1,28 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { useToast } from "@/hooks/use-toast";
-import { signUp } from "@/lib/supabase";
-import { Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Register = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { register, isAuthenticated } = useAuth();
+
+  // If user is already authenticated, redirect to dashboard
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleRegister = async (email: string, password: string) => {
     setIsLoading(true);
+    
     try {
-      await signUp(email, password);
-      
-      toast({
-        title: "Cadastro bem-sucedido",
-        description: "Sua conta foi criada com sucesso",
-      });
-      
-      // Redirect to dashboard
-      navigate("/dashboard");
-    } catch (error: any) {
-      console.error("Registration error:", error);
-      
-      toast({
-        title: "Erro no cadastro",
-        description: error.message || "Ocorreu um erro ao tentar criar sua conta.",
-        variant: "destructive",
-      });
-      
-      throw error;
+      const { error } = await register(email, password);
+      if (error) throw error;
+    } catch (error) {
+      console.error("Registration failed:", error);
     } finally {
       setIsLoading(false);
     }
@@ -44,38 +32,29 @@ const Register = () => {
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Crie sua conta
-                </h1>
-                <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Comece a criar roteiros e prompts para "O Mundo de Dom"
-                </p>
-              </div>
-              <div className="w-full max-w-md mx-auto">
-                {isLoading ? (
-                  <div className="flex justify-center py-8">
-                    <div className="flex flex-col items-center">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-                      <p className="text-muted-foreground">Criando sua conta...</p>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <AuthForm type="register" onSubmit={handleRegister} />
-                    <div className="mt-4 text-center text-sm">
-                      Já tem uma conta?{" "}
-                      <Link to="/login" className="text-primary hover:underline">
-                        Entrar
-                      </Link>
-                    </div>
-                  </>
-                )}
-              </div>
+        <section className="container flex flex-col items-center justify-center py-12 md:py-24">
+          <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+            <div className="flex flex-col space-y-2 text-center">
+              <h1 className="text-2xl font-semibold tracking-tight">
+                Crie sua conta
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Cadastre-se para começar a usar o Dom Script Forge
+              </p>
             </div>
+
+            <AuthForm 
+              type="register" 
+              onSubmit={handleRegister}
+              isLoading={isLoading}
+            />
+
+            <p className="px-8 text-center text-sm text-muted-foreground">
+              Já tem uma conta?{" "}
+              <Link to="/login" className="underline underline-offset-4 hover:text-primary">
+                Entrar
+              </Link>
+            </p>
           </div>
         </section>
       </main>
