@@ -1,20 +1,23 @@
 
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useToast } from "@/hooks/use-toast";
+import { signUp } from "@/lib/supabase";
+import { Loader2 } from "lucide-react";
 
 const Register = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
-      // Mock registration logic - will replace with Supabase auth
-      console.log("Register with:", email, password);
+      await signUp(email, password);
       
-      // For demo purposes, let's simulate a successful registration
       toast({
         title: "Cadastro bem-sucedido",
         description: "Sua conta foi criada com sucesso",
@@ -22,9 +25,18 @@ const Register = () => {
       
       // Redirect to dashboard
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error:", error);
+      
+      toast({
+        title: "Erro no cadastro",
+        description: error.message || "Ocorreu um erro ao tentar criar sua conta.",
+        variant: "destructive",
+      });
+      
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -44,13 +56,24 @@ const Register = () => {
                 </p>
               </div>
               <div className="w-full max-w-md mx-auto">
-                <AuthForm type="register" onSubmit={handleRegister} />
-                <div className="mt-4 text-center text-sm">
-                  Já tem uma conta?{" "}
-                  <Link to="/login" className="text-primary hover:underline">
-                    Entrar
-                  </Link>
-                </div>
+                {isLoading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="flex flex-col items-center">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+                      <p className="text-muted-foreground">Criando sua conta...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <AuthForm type="register" onSubmit={handleRegister} />
+                    <div className="mt-4 text-center text-sm">
+                      Já tem uma conta?{" "}
+                      <Link to="/login" className="text-primary hover:underline">
+                        Entrar
+                      </Link>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

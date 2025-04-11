@@ -17,6 +17,14 @@ export function Footer() {
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             Privacidade
           </Link>
+          <a 
+            href="https://github.com/your-repo/dom-script-forge" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            GitHub
+          </a>
         </nav>
       </div>
     </footer>

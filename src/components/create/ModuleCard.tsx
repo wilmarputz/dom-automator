@@ -23,6 +23,9 @@ export function ModuleCard({ module, selected, onClick }: ModuleCardProps) {
           : "border-border hover:border-primary/50 hover:bg-secondary/30"
       }`}
       onClick={onClick}
+      role="button"
+      aria-pressed={selected}
+      aria-label={`Selecionar módulo ${module.title}`}
     >
       {selected && (
         <div className="absolute top-2 right-2 bg-primary rounded-full p-0.5">

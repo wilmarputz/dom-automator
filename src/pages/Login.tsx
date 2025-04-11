@@ -1,20 +1,23 @@
 
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useToast } from "@/hooks/use-toast";
+import { signIn } from "@/lib/supabase";
+import { Loader2 } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
-      // Mock login logic - will replace with Supabase auth
-      console.log("Login with:", email, password);
+      await signIn(email, password);
       
-      // For demo purposes, let's simulate a successful login
       toast({
         title: "Login bem-sucedido",
         description: "Você foi conectado com sucesso",
@@ -22,9 +25,18 @@ const Login = () => {
       
       // Redirect to dashboard
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
+      
+      toast({
+        title: "Erro no login",
+        description: error.message || "Ocorreu um erro ao tentar fazer login. Verifique suas credenciais.",
+        variant: "destructive",
+      });
+      
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -44,13 +56,24 @@ const Login = () => {
                 </p>
               </div>
               <div className="w-full max-w-md mx-auto">
-                <AuthForm type="login" onSubmit={handleLogin} />
-                <div className="mt-4 text-center text-sm">
-                  Não tem uma conta?{" "}
-                  <Link to="/register" className="text-primary hover:underline">
-                    Cadastre-se
-                  </Link>
-                </div>
+                {isLoading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="flex flex-col items-center">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+                      <p className="text-muted-foreground">Autenticando...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <AuthForm type="login" onSubmit={handleLogin} />
+                    <div className="mt-4 text-center text-sm">
+                      Não tem uma conta?{" "}
+                      <Link to="/register" className="text-primary hover:underline">
+                        Cadastre-se
+                      </Link>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
