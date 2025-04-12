@@ -73,7 +73,7 @@ export function AuthForm({ type, onSubmit, isLoading = false }: AuthFormProps) {
         <CardDescription>
           {type === "login"
             ? "Entre na sua conta para acessar seus episódios"
-            : "Crie uma conta para começar a usar o Dom Script Forge"}
+            : "Crie uma conta para começar a usar o Dom Script Automator"}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>

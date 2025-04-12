@@ -7,7 +7,7 @@ export function Footer() {
       <div className="container flex flex-col items-center justify-between gap-4 py-10 md:h-24 md:flex-row md:py-0">
         <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
           <p className="text-center text-sm leading-loose md:text-left text-muted-foreground">
-            &copy; {new Date().getFullYear()} Dom Script Forge. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} Dom Script Automator. Todos os direitos reservados.
           </p>
         </div>
         <nav className="flex gap-4">

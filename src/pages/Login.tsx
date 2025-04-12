@@ -39,7 +39,7 @@ const Login = () => {
                 Bem-vindo de volta
               </h1>
               <p className="text-sm text-muted-foreground">
-                Entre na sua conta para acessar o Dom Script Forge
+                Entre na sua conta para acessar o Dom Script Automator
               </p>
             </div>
 

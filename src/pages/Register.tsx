@@ -39,7 +39,7 @@ const Register = () => {
                 Crie sua conta
               </h1>
               <p className="text-sm text-muted-foreground">
-                Cadastre-se para começar a usar o Dom Script Forge
+                Cadastre-se para começar a usar o Dom Script Automator
               </p>
             </div>
 

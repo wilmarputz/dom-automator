@@ -24,7 +24,7 @@ const Index = () => {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Dom Script Forge
+                    Dom Script Automator
                   </h1>
                   <p className="text-gradient text-xl sm:text-2xl">
                     Sua ferramenta de criação para a série "O Mundo de Dom"

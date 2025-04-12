@@ -15,7 +15,7 @@ export function Navbar() {
         <div className="flex gap-6 md:gap-10">
           <Link to="/" className="flex items-center space-x-2">
             <span className="font-bold text-xl text-gradient">
-              Dom Script Forge
+              Dom Script Automator
             </span>
           </Link>
         </div>
