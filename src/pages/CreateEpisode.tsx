@@ -276,9 +276,75 @@ const CreateEpisode = () => {
 };
 
 
-  // Função Placeholder para Exportar
-  const handleExport = (format: string) => {
-    toast({ title: "Exportação (Simulação)", description: `Conteúdo seria exportado como ${format.toUpperCase()}` });
+  // Função para lidar com exportação (focada em TXT)
+  const handleExport = (format: 'txt' /*| 'docx' | 'pdf'*/) => { // Limitado a TXT por agora
+    if (format !== 'txt') {
+        toast({
+            title: "Exportação não disponível",
+            description: `A exportação para ${format.toUpperCase()} ainda não foi implementada.`,
+            variant: "default"
+        });
+        return;
+    }
+
+    // 1. Determinar o conteúdo a ser exportado baseado na aba ativa
+    const activeModuleId = activeTab;
+    let contentToExport: string | null | undefined;
+    let moduleNameForFile: string = 'desconhecido';
+
+    if (activeModuleId === 'script') {
+        contentToExport = script;
+        moduleNameForFile = 'roteiro_base';
+        console.log("Exportando Roteiro Base...");
+    } else {
+        contentToExport = generatedContent[activeModuleId];
+        moduleNameForFile = activeModuleId;
+        console.log(`Exportando Módulo: ${moduleNameForFile}...`);
+    }
+
+    // 2. Validar se há conteúdo
+    if (!contentToExport || contentToExport.trim() === "") {
+        toast({
+            title: "Conteúdo Vazio",
+            description: "Não há conteúdo nesta aba para exportar como TXT.",
+            variant: "destructive"
+        });
+        console.warn("Tentativa de exportar conteúdo vazio.");
+        return;
+    }
+
+    // 3. Criar o nome do ficheiro (Sanitizado)
+    const episodeTitleSlug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9_]+/g, '_')
+        .replace(/_{2,}/g, '_')
+        .substring(0, 40) || 'episodio';
+    const filename = `dom_${episodeTitleSlug}_${moduleNameForFile}.txt`;
+    console.log(`Nome do ficheiro gerado: ${filename}`);
+
+    // 4. Gerar o Ficheiro TXT e Iniciar Download
+    try {
+        const blob = new Blob([contentToExport], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        console.log("Download TXT iniciado com sucesso.");
+        toast({ title: "Download Iniciado", description: `O ficheiro ${filename} está a ser descarregado.` });
+
+    } catch (error) {
+        console.error(`Erro ao gerar ou descarregar ficheiro TXT:`, error);
+        toast({
+            title: "Erro ao Exportar TXT",
+            description: "Não foi possível gerar ou descarregar o ficheiro.",
+            variant: "destructive"
+        });
+    }
   };
 
 
